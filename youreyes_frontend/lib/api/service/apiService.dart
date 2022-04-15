@@ -40,8 +40,8 @@ class APIService{
     return _route;
   }
 
-  Future sendImage(Image image,AudioPlayer player)async{
-    
+  Future<bool> sendImage(Image image,AudioPlayer player)async{
+    bool returned  = false;
     var imageFile = File(image.imagePath);
     print("clfjfldjfkljdlaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       // open a bytestream
@@ -77,7 +77,7 @@ class APIService{
       // });
 
         print("Image Name: $value");
-          
+          returned = true;
           // Another option
         //  player.setAsset("assets/Background-1.mp3");
         //  player.play();
@@ -107,6 +107,7 @@ class APIService{
         // }
       
     });
+    return returned;
 
   }
 }
