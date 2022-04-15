@@ -6,22 +6,27 @@ class TranslationService{
   String convert(Translation translation){
 
     String audioName = '';
+    print('translation text: ${translation.text}');
     translation.audioMap.forEach((k,v) => {
-      if(translation.text == k){
+      if(translation.text.contains(k)){
         audioName = v
-      }else{
-        print('[INFO] Audio not found for the text.')
       }
 
+
     });
+    if(audioName == ''){
+        print('[INFO] Audio not found for the text.');
+      }
     return audioName;
     
   }
 
-  void playAudio(AudioPlayer player,Translation translation){
+  Future playAudio(AudioPlayer player,Translation translation)async{
     String audioName = convert(translation);
     print('Audio nameeee: $audioName');
-    player.setAsset(audioName);
-    player.play();
+     print('gonna play');
+    await player.setAsset(audioName);
+   
+    await player.play();
   }
 }
