@@ -52,7 +52,10 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
   void _startListening() async {
     await _speechToText.listen(onResult: _onSpeechResult);
     
-    setState(() {});
+    setState(() {
+      stopped = false;
+      isListening = true;
+    });
   }
 
  
@@ -68,15 +71,16 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
           stopped = true;
         });
         await _getDestination(_lastWords);
-        
-      
+             
       }
     }
+    setState(() {});
+    
+    
   }
     
     
     
-  
 
   void _onSpeechResult(SpeechRecognitionResult result)async{
     setState(() {
@@ -85,18 +89,8 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
     });
     
       _stopListening();
+
     
-    // print(_lastWords);
-    //  await  _getDestination("Addis Ababa Institute of Technology");
-    //   final cameras = await availableCameras();
-    //   final firstCamera = cameras.first;
-    //   // Get a specific camera from the list of available cameras.
-    //   navigatorKey.currentState!.pop();
-    //    navigatorKey.currentState!.push(
-    //     MaterialPageRoute(
-    //       builder: (context) => TakePicturePage(instructions: _instructions, camera: firstCamera)
-    //     ),
-    //   );
   
   
   }
@@ -113,7 +107,6 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
     if(query != ''){
     Map<String,dynamic> result = await _destinationService.getDestination(query);
     List<dynamic> _steps = await _destinationService.getRoute(result["destination"],result["address"]);
-    
      setState(() {
         _instructions = _instructionService.getInstruction(_steps);
       
@@ -122,8 +115,9 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
       final cameras = await availableCameras();
       final firstCamera = cameras.first;
       // Get a specific camera from the list of available cameras.
-     
+
        navigatorKey.currentState!.pop();
+
       
        await navigatorKey.currentState!.push(
         MaterialPageRoute(
@@ -155,9 +149,11 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
 
                   onPressed:
                       // If not yet listening for speech start, otherwise stop
+
                     _speechToText.isNotListening ? _startListening : _stopListening,
                   //  tooltip: 'Listen',
                     child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic, size:90),
+
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(MediaQuery.of(context).size.width,(MediaQuery.of(context).size.height/2) - 5)
                     )

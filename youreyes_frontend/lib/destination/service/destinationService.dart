@@ -15,39 +15,47 @@ class DestinationService{
   APIService _apiService = APIService();
 
   Future<Map<String,dynamic>> getDestination(String query) async{
-      UserLocationService _userLocationService = UserLocationService();
+   // Map<String,dynamic> dest = {};
+    try{
+       UserLocationService _userLocationService = UserLocationService();
       UserLocation _userLocation = await _userLocationService.getCurrentLocation(); 
       List<Address> _addresses = await Geocoder.local.findAddressesFromQuery(query);
       Address _address = _addresses.first;
       print("Total Distance from geolocator: ${Geolocator.distanceBetween(_userLocation.latitude, _userLocation.longitude, _address.coordinates.latitude, _address.coordinates.longitude)}");
       print("Country: ${_address.countryName} , Feature name: ${_address.featureName} , Coordinates: ${_address.coordinates}");
       Map<String,double> destination = {"latitude":_address.coordinates.latitude,"longitude":_address.coordinates.longitude};
+      //dest = {"destination":Destination(destination: destination,userLocation: _userLocation),"address": _address};
       return {"destination":Destination(destination: destination,userLocation: _userLocation),"address": _address};
-
+    }catch(e){
+      throw Exception('Destination not found');
+      
+    }  
+    
     
       
   }
 
   Future<List<dynamic>> getRoute(Destination destination,Address address) async{
-    Map<String,dynamic> route = await _apiService.sendDestination(destination);
+     List<dynamic> _steps = [];
+    try{
+       Map<String,dynamic> route = await _apiService.sendDestination(destination);
     
-    List<dynamic> _steps = [];
-    int stepLength;
-    var _firstDistance;
-    _steps = route['routes'][0]['segments'][0]["steps"] as List;
-    _firstDistance = route['routes'][0]['summary']["distance"];
-    stepLength = _steps.length;
-    _steps[stepLength -1]['maneuver']['location'] = [address.coordinates.longitude,address.coordinates.latitude];
-    print("Length: $stepLength");
-    print("Total distance from route: $_firstDistance");
-
      
+      int stepLength;
+      var _firstDistance;
+      _steps = route['routes'][0]['segments'][0]["steps"] as List;
+      _firstDistance = route['routes'][0]['summary']["distance"];
+      stepLength = _steps.length;
+      _steps[stepLength -1]['maneuver']['location'] = [address.coordinates.longitude,address.coordinates.latitude];
+      print("Length: $stepLength");
+      print("Total distance from route: $_firstDistance");
+
     
+    }catch(e){
+      throw Exception('Destination not found');
+    }
     return _steps;
   }
 
 }
- // For the first page
-//1. getDestination
-//2. getRoute
-//3. getInstruction
+
