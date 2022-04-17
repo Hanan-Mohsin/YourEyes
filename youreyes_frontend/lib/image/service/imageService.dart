@@ -8,8 +8,9 @@ class ImageService{
 
   APIService _apiService = APIService();
   String imagePath = 'imagePath';
+
   Future<bool> takePicture(CameraController controller,Future<void> intializeCamera,AudioPlayer player) async{
-    
+    bool returned = false;
    // if(imagePath != ''){
    
      // imagePath = '';
@@ -24,14 +25,14 @@ class ImageService{
           
           imagePath = image.path;
           print("IMAGE PATH: $imagePath");        
-         // return true;
-          await uploadImage(Image(imagePath: imagePath),player);
+         return true;
+         // returned = await uploadImage(Image(imagePath: imagePath),player);
         
       }catch(e){
         print('erorrrrrrrrrrrrrrrrrrrrr$e');
-        return false;
+        returned = false;
       }
-      return true;
+      return returned;
     //}
   }
 

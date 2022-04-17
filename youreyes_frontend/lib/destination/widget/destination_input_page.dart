@@ -58,7 +58,6 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
     });
   }
 
- 
   void _stopListening() async {
     await _speechToText.stop();
     setState(() {});
@@ -71,7 +70,16 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
           stopped = true;
         });
         await _getDestination(_lastWords);
-             
+
+        }catch(e){
+         await _playAudio('assets/NotFound.m4a');
+         print('Destination not found!');
+        }
+       
+       
+        
+      
+
       }
     }
     setState(() {});
