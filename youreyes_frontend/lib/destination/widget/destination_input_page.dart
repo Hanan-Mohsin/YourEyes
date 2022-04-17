@@ -59,7 +59,6 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
     });
   }
 
- 
   void _stopListening() async {
     await _speechToText.stop();
     if(!stopped){  
