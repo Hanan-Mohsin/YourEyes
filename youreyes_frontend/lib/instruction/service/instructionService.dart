@@ -24,6 +24,7 @@ class InstructionService{
  
   // instructions and address will be passed from the previous pages
 
+
  
   // Future<List<Instruction>> deliverInstruction(List<Instruction> instructions,Position currentPosition,AudioPlayer player,int instLength) async {
     
@@ -75,6 +76,7 @@ class InstructionService{
         instructions.removeAt(0); 
         await _tService.playAudio(player, Translation(text: inst));
            
+
     }
     
    }

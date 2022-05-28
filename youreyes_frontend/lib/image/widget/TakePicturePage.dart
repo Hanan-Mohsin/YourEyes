@@ -20,11 +20,12 @@ class TakePicturePage extends StatefulWidget {
     Key? key,
     required this.instructions,
     required this.camera,
+    required this.player
   }) : super(key: key);
 
   final CameraDescription camera;
   final List<Instruction> instructions;
-
+  final AudioPlayer player;
   @override
   TakePicturePageState createState() => TakePicturePageState();
 }
@@ -38,7 +39,7 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
   DestinationService _destinationService = DestinationService();
   InstructionService _instructionService = InstructionService();
   List<Instruction> _instructions = [];
-  AudioPlayer player = AudioPlayer();
+  late AudioPlayer player;
   ImageService _imageService = ImageService();
   late AppLifecycleState _cameraState;
   bool isDone = true;
@@ -80,6 +81,8 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
     
     // To display the current output from the Camera,
     // create a CameraController.
+    player = AudioPlayer();
+ 
     _controller = CameraController(
       // Get a specific camera from the list of available cameras.
       widget.camera,
@@ -118,17 +121,23 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
 
  
 
-   void _listenChange() {
-    Geolocator.getPositionStream().listen((position) {
-	if(mounted){
-      setState(() {
-        
-        _instructions = _instructionService.deliverInstruction(_instructions, position, player,instLength);
-      });
-	  }
+   void _listenChange() async{
+     if(_instructions.length > 0){
+      Geolocator.getPositionStream().listen((position) {
+      if(mounted){
       
-    //  print("Position changed: $position");
-    });
+          
+          _instructionService.deliverInstruction(_instructions, position, widget.player,instLength).then((inst){
+            setState(() {
+              _instructions = inst;
+            });
+          });
+        
+      }
+        
+      //  print("Position changed: $position");
+      });
+     }
   }
 
   @override
@@ -168,37 +177,37 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
          
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        // Provide an onPressed callback.
-        onPressed: () async {
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
-          try {
-            // Ensure that the camera is initialized.
-            await _initializeControllerFuture;
+      // floatingActionButton: FloatingActionButton(
+      //   // Provide an onPressed callback.
+      //   onPressed: () async {
+      //     // Take the Picture in a try / catch block. If anything goes wrong,
+      //     // catch the error.
+      //     try {
+      //       // Ensure that the camera is initialized.
+      //       await _initializeControllerFuture;
 
-            // Attempt to take a picture and get the file `image`
-            // where it was saved.
-            print("TAKING PICTURE");
-            final image = await _controller.takePicture();
-            print("IMAGE PATH: ${image.path}");
-            // If the picture was taken, display it on a new screen.
-            // await Navigator.of(context).push(
-            //   MaterialPageRoute(
-            //     builder: (context) => DisplayPictureScreen(
-            //       // Pass the automatically generated path to
-            //       // the DisplayPictureScreen widget.
-            //       imagePath: image.path,
-            //     ),
-            //   ),
-            // );
-          } catch (e) {
-            // If an error occurs, log the error to the console.
-            print(e);
-          }
-        },
-        child: const Icon(Icons.camera_alt),
-      ),
+      //       // Attempt to take a picture and get the file `image`
+      //       // where it was saved.
+      //       print("TAKING PICTURE");
+      //       final image = await _controller.takePicture();
+      //       print("IMAGE PATH: ${image.path}");
+      //       // If the picture was taken, display it on a new screen.
+      //       // await Navigator.of(context).push(
+      //       //   MaterialPageRoute(
+      //       //     builder: (context) => DisplayPictureScreen(
+      //       //       // Pass the automatically generated path to
+      //       //       // the DisplayPictureScreen widget.
+      //       //       imagePath: image.path,
+      //       //     ),
+      //       //   ),
+      //       // );
+      //     } catch (e) {
+      //       // If an error occurs, log the error to the console.
+      //       print(e);
+      //     }
+      //   },
+      //   child: const Icon(Icons.camera_alt),
+      // ),
     );
   }
 }
