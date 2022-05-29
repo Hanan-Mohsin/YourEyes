@@ -2,7 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:youreyes_frontend/api/service/service.dart';
 import 'package:youreyes_frontend/image/model/model.dart';
-import 'package:youreyes_frontend/translation/service/translationService.dart';
+
 
 class ImageService{
 
@@ -10,11 +10,8 @@ class ImageService{
   String imagePath = 'imagePath';
 
   Future<bool> takePicture(CameraController controller,Future<void> intializeCamera,AudioPlayer player) async{
-    bool returned = false;
-   // if(imagePath != ''){
-   
-     // imagePath = '';
-      print("blaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+   // bool returned = false;
+  
         
       try{
           await intializeCamera;
@@ -25,19 +22,19 @@ class ImageService{
           
           imagePath = image.path;
           print("IMAGE PATH: $imagePath");        
-         return true;
+         return  await uploadImage(Image(imagePath: imagePath),player);
          // returned = await uploadImage(Image(imagePath: imagePath),player);
         
       }catch(e){
         print('erorrrrrrrrrrrrrrrrrrrrr$e');
-        returned = false;
+        return false;
       }
-      return returned;
+     // return false;
     //}
   }
 
-  Future uploadImage(Image image, AudioPlayer player) async{
-    await _apiService.sendImage(image, player);
+  Future<bool> uploadImage(Image image, AudioPlayer player) async{
+    return await _apiService.sendImage(image, player);
   }
 
 
