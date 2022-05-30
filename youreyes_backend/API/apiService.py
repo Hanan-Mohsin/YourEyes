@@ -47,7 +47,7 @@ class APIService:
         return {"image":results['image'],"detections":detections}
         return 
         #return FinalResult.returnResult(imagePath)
-   
+  
 
 if __name__ == '__main__':
    
