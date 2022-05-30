@@ -5,6 +5,7 @@ import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:youreyes_frontend/destination/model/model.dart';
 import 'package:http/http.dart' as http;
+import 'package:youreyes_frontend/direction/service/service.dart';
 import 'package:youreyes_frontend/image/model/model.dart';
 import 'package:youreyes_frontend/translation/model/translation.dart';
 import 'package:youreyes_frontend/translation/service/translationService.dart';
@@ -13,8 +14,8 @@ import 'package:youreyes_frontend/translation/service/translationService.dart';
 
 class APIService{
   final http.Client httpClient = http.Client();
-  TranslationService _translationService = TranslationService();
-  
+  //TranslationService _translationService = TranslationService();
+  DirectionService _directionService = DirectionService();
   bool isPlaying = false;
   Future<Map<String,dynamic>>sendDestination(Destination destination)async{
     Map<String,dynamic> _route={};
@@ -40,8 +41,8 @@ class APIService{
     return _route;
   }
 
-  Future sendImage(Image image,AudioPlayer player)async{
-    
+  Future<bool> sendImage(Image image,AudioPlayer player)async{
+
     var imageFile = File(image.imagePath);
     print("clfjfldjfkljdlaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       // open a bytestream
@@ -50,7 +51,7 @@ class APIService{
     var length = await imageFile.length();
 
     // string to uri
-    var uri = Uri.parse("http://192.168.1.6:5000/image");
+    var uri = Uri.parse("http://192.168.1.11:5000/image");
 
     // create multipart request
     var request = new http.MultipartRequest("POST", uri);
@@ -76,13 +77,16 @@ class APIService{
         
       // });
 
-        print("Image Name: $value");
-          
+        //print("Image Name: $value");
+        Map result = json.decode(value);
+        print("result: ${result['detections']}");
+        _directionService.tellDirection(result['detections'], player).then((value) => null);
+          // directon method is called here
           // Another option
         //  player.setAsset("assets/Background-1.mp3");
         //  player.play();
 
-          _translationService.playAudio(player, Translation(text: 'right'));
+          //_translationService.playAudio(player, Translation(text: 'right'));
           // if(!isPlaying){
           //   isPlaying = true;
           //   _translationService.playAudio(player, Translation(text: 'trial'));
@@ -107,6 +111,12 @@ class APIService{
         // }
       
     });
+    if(response.statusCode == 200){
+      return true;
+    }else{
+      return false;
+    }
+    
 
   }
 }
