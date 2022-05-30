@@ -27,7 +27,7 @@ class DirectionService{
     String instruction='';
     String inst='';
     for(var detection in detections){
-      if(double.parse(detection['distance']) < 0.5){
+      if(double.parse(detection['distance']) <= 0.5){
         double xmid = (double.parse(detection['BBoxes']['xmax']) + double.parse(detection['BBoxes']['xmin']))/2;
          if((xmid > 0.3) & (xmid < 0.7)){
            if((xmid - 0.3).abs() < (xmid - 0.7).abs()){
