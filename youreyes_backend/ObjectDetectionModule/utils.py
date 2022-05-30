@@ -1,4 +1,6 @@
+
 import tensorflow as tf 
+
 
 class Utils():
 
@@ -17,7 +19,6 @@ class Utils():
 
     def performNMS(self):
         print('[INFO] Performing NMS')
-        print(self.iouThreshold)
         boxess, scores, classes, valid_detections = tf.image.combined_non_max_suppression(
             boxes=tf.reshape(self.boxes, (tf.shape(self.boxes)[0], -1, 1, 4)),
             scores=tf.reshape(

@@ -29,7 +29,6 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
   bool _speechEnabled = false;
   String _lastWords = '';
   bool stopped = false;
-  bool isListening = false;
   AudioPlayer player = AudioPlayer();
    @override
   void initState() {
@@ -61,15 +60,17 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
 
   void _stopListening() async {
     await _speechToText.stop();
+    setState(() {});
+    
     if(!stopped){  
       if(_lastWords !=''){
-         print(_lastWords);
-        try{
-          setState(() {
-            stopped = true;
-            isListening = false;
+        print('fkjkfjkfjkfjkfjkf');
+        print(_lastWords);
+        setState(() {
+          stopped = true;
         });
         await _getDestination(_lastWords);
+
         }catch(e){
          await _playAudio('assets/NotFound.m4a');
          print('Destination not found!');
@@ -78,6 +79,7 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
        
         
       
+
       }
     }
     setState(() {});
@@ -94,7 +96,8 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
       
     });
     
-    //  _stopListening();
+      _stopListening();
+
     
   
   
@@ -120,8 +123,9 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
       final cameras = await availableCameras();
       final firstCamera = cameras.first;
       // Get a specific camera from the list of available cameras.
-     
-       //navigatorKey.currentState!.pop();
+
+       navigatorKey.currentState!.pop();
+
       
        await navigatorKey.currentState!.push(
         MaterialPageRoute(
@@ -153,9 +157,11 @@ class _DestinationInputPageState extends State<DestinationInputPage>{
 
                   onPressed:
                       // If not yet listening for speech start, otherwise stop
-                   !isListening ? _startListening : _stopListening,
+
+                    _speechToText.isNotListening ? _startListening : _stopListening,
                   //  tooltip: 'Listen',
-                    child: Icon(!isListening ? Icons.mic_off : Icons.mic, size:90),
+                    child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic, size:90),
+
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(MediaQuery.of(context).size.width,(MediaQuery.of(context).size.height/2) - 5)
                     )
