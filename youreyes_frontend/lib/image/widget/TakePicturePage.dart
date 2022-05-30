@@ -35,39 +35,17 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
   late Future<void> _initializeControllerFuture;
   bool done = false;
   late Timer _timer;
-  late Position _currentPosition;
+  late Timer _timer2;
+  Map<String,double> _currentPosition = {};
+
   DestinationService _destinationService = DestinationService();
   InstructionService _instructionService = InstructionService();
   List<Instruction> _instructions = [];
   late AudioPlayer player;
   ImageService _imageService = ImageService();
-  late AppLifecycleState _cameraState;
   bool isDone = true;
   int instLength = 0;
-  void didChangeAppLifecycleState(AppLifecycleState state){
-    // setState(() {
-    //   _cameraState = state;
-    // });
-    switch(state){
-      case AppLifecycleState.resumed:
-        print("resumed");
-        break;
-      case AppLifecycleState.detached:
-        print("detached");
-       // _controller.dispose();
-        break;
-      case AppLifecycleState.paused:
-        print("paused");
-       // _controller.dispose();
-        break;
-      case AppLifecycleState.inactive:
-        print("inactive");
-       // _controller.dispose();
-        break;
-
-
-    }
-  }
+ 
  
 
   @override
@@ -101,9 +79,11 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
         print(instruction.checkpoint);
         print(instruction.distance);
        }
-       _listenChange();
-      }
       
+      }
+      if(_instructions.length == instLength){
+        _listenChange();
+      }
      super.initState();
      
      
@@ -113,6 +93,7 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
   void dispose() {
     // Dispose of the controller when the widget is disposed.
     _timer.cancel();
+   // _timer2.cancel();
     _controller.dispose();
     player.dispose();
     WidgetsBinding.instance!.removeObserver(this);
@@ -121,22 +102,42 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
 
  
 
-   void _listenChange() async{
-     if(_instructions.length > 0){
-      Geolocator.getPositionStream().listen((position) {
-      if(mounted){
-      
+  // void _listenChange() async{
+  //    if(_instructions.length > 0){
+  //     Geolocator.getPositionStream().listen((position) {
+  //     if(mounted){
+         
           
-          _instructionService.deliverInstruction(_instructions, position, widget.player,instLength).then((inst){
+  //         _instructionService.deliverInstruction(_instructions, position, widget.player,instLength).then((inst){
+  //           setState(() {
+  //             _instructions = inst;
+  //           });
+  //         });
+        
+  //     }
+        
+  //     //  print("Position changed: $position");
+  //     });
+  //    }
+  // }
+
+   void _listenChange(){
+     print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+     if(_instructions.length > 0){
+      if(mounted){
+         
+          setState(() {
+            _currentPosition['latitude'] = _instructions[0].checkpoint['latitude'];
+            _currentPosition['longitude'] = _instructions[0].checkpoint['longitude'];
+          });
+          _instructionService.deliverInstruction(_instructions, _currentPosition, widget.player,instLength).then((inst){
             setState(() {
               _instructions = inst;
             });
           });
         
       }
-        
-      //  print("Position changed: $position");
-      });
+ 
      }
   }
 
@@ -151,9 +152,21 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
           });
         _imageService.takePicture(_controller, _initializeControllerFuture, player).then((value){setState(() {
           isDone = value;
+          // if(isDone){
+          //   //direction method is called
+          // }
+          
         });});
         }
     });
+
+    //  _timer2 = Timer(Duration(seconds:40),() {
+    //    if(mounted){
+    //       _listenChange();
+    //    }
+       
+        
+    // });
       
       
     }
@@ -212,20 +225,3 @@ class TakePicturePageState extends State<TakePicturePage> with WidgetsBindingObs
   }
 }
 
-// A widget that displays the picture taken by the user.
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
-
-  const DisplayPictureScreen({Key? key, required this.imagePath})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Display the Picture')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
-    );
-  }
-}
